@@ -2,16 +2,19 @@ cmake_minimum_required(VERSION 2.8.12)
 
 project(okay)
 
+cmake_policy(SET CMP0079 NEW)
 
 #Make sure vcpkg root is set in environment variables.
 include("$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+
+add_definitions(-DCASS_STATIC)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")  
   
   # vcpkg install libuv:x64-windows openssl:x64-windows lz4:x64-windows zlib:x64-windows
   set(CMAKE_VS_DEVENV_COMMAND "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\devenv.ico")
-  set(VCPKG_TARGET_TRIPLET x64-windows CACHE STRING "" FORCE)  
-  # set(VCPKG_CRT_LINKAGE static)
+  set(VCPKG_TARGET_TRIPLET x64-windows-static CACHE STRING "" FORCE)  
+  set(VCPKG_CRT_LINKAGE static)
   # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
   # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")  
 endif()
@@ -29,9 +32,22 @@ find_package(ZLIB REQUIRED)
 
 add_subdirectory(cpp-driver)
 
-cmake_policy(SET CMP0079 NEW)
+
+add_library(my_library SHARED "my_library.c")
+target_include_directories(my_library PUBLIC cpp-driver/include)
+target_link_libraries(my_library PUBLIC cassandra_static)
+set_target_properties(my_library PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+#---------------
+# Test
+#---------------
 
 add_executable(test "test.c")
-
 target_include_directories(test PUBLIC cpp-driver/include)
-target_link_libraries(test PUBLIC cassandra)
+target_link_libraries(test PUBLIC my_library)
+
+# Print variables
+# get_cmake_property(_variable_names VARIABLES)
+
+# foreach (_variable_name ${_variable_names})
+#     message(STATUS "${_variable_name} = ${${_variable_name}}")
+# endforeach()
