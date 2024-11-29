@@ -1,11 +1,13 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.10)
+
+cmake_policy(SET CMP0079 NEW)
+cmake_policy(SET CMP0074 NEW)
+set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 project(okay)
 
-cmake_policy(SET CMP0079 NEW)
-
 #Make sure vcpkg root is set in environment variables.
-include("$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
+# include("$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 # add_definitions(-DCASS_STATIC)
 
@@ -24,7 +26,10 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
   # vcpkg install libuv:x64-linux openssl:x64-linux lz4:x64-linux zlib:x64-linux
-  set(VCPKG_TARGET_TRIPLET x64-linux CACHE STRING "" FORCE)
+  set(VCPKG_TARGET_TRIPLET x64-linux CACHE STRING "" FORCE)  
+  set(VCPKG_CRT_LINKAGE static)
+  set(VCPKG_LIBRARY_LINKAGE static)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
 
@@ -32,8 +37,9 @@ find_package(OpenSSL REQUIRED)
 find_package(libuv CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 
-add_subdirectory(cpp-driver)
+set(LIBUV_ROOT_DIR "$ENV{VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/")
 
+add_subdirectory(cpp-driver)
 
 # add_library(my_library SHARED "my_library.c")
 # target_include_directories(my_library PUBLIC cpp-driver/include)
