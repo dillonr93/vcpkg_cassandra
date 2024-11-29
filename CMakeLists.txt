@@ -2,14 +2,11 @@ cmake_minimum_required(VERSION 3.10)
 
 cmake_policy(SET CMP0079 NEW)
 cmake_policy(SET CMP0074 NEW)
+
+#Make sure vcpkg root is set in environment variables.
 set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 project(okay)
-
-#Make sure vcpkg root is set in environment variables.
-# include("$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
-
-# add_definitions(-DCASS_STATIC)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")  
   
@@ -19,6 +16,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   #Setting triplet to static makes the libraries that is being used to be statically linked to the dll or exe
   set(VCPKG_TARGET_TRIPLET x64-windows-static CACHE STRING "" FORCE)  
   set(VCPKG_CRT_LINKAGE static)
+  set(VCPKG_LIBRARY_LINKAGE static)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
   # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
   # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")  
 endif()
@@ -30,6 +29,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(VCPKG_CRT_LINKAGE static)
   set(VCPKG_LIBRARY_LINKAGE static)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  set(LIBUV_ROOT_DIR "$ENV{VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/")
 endif()
 
 
@@ -37,23 +37,11 @@ find_package(OpenSSL REQUIRED)
 find_package(libuv CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 
-set(LIBUV_ROOT_DIR "$ENV{VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/")
-
 add_subdirectory(cpp-driver)
-
-# add_library(my_library SHARED "my_library.c")
-# target_include_directories(my_library PUBLIC cpp-driver/include)
-# target_link_libraries(my_library PUBLIC cassandra_static)
-# target_compile_definitions(my_library PRIVATE CASS_STATIC)
-# set_target_properties(my_library PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
-#---------------
-# Test
-#---------------
 
 add_executable(test "test.c")
 target_include_directories(test PUBLIC cpp-driver/include)
 target_link_libraries(test PUBLIC cassandra)
-
 
 # Print variables
 # get_cmake_property(_variable_names VARIABLES)
