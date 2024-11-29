@@ -8,10 +8,11 @@ set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 
 project(okay)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")  
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")    
   
-  # vcpkg install libuv:x64-windows openssl:x64-windows lz4:x64-windows zlib:x64-windows
   set(CMAKE_VS_DEVENV_COMMAND "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\devenv.ico")
+
+  # vcpkg install libuv:x64-windows openssl:x64-windows lz4:x64-windows zlib:x64-windows
 
   #Setting triplet to static makes the libraries that is being used to be statically linked to the dll or exe
   set(VCPKG_TARGET_TRIPLET x64-windows-static CACHE STRING "" FORCE)  
@@ -28,7 +29,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(VCPKG_TARGET_TRIPLET x64-linux CACHE STRING "" FORCE)  
   set(VCPKG_CRT_LINKAGE static)
   set(VCPKG_LIBRARY_LINKAGE static)
-  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)  
   set(LIBUV_ROOT_DIR "$ENV{VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/")
 endif()
 

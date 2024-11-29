@@ -120,8 +120,8 @@ if(CASS_USE_ZLIB)
     find_package(ZLIB)
     if(ZLIB_FOUND)
       # Determine if the static library needs to be used for Windows
-      if(WIN32 AND CASS_USE_STATIC_LIBS)
-        string(REPLACE "zlib.lib" "zlibstatic.lib" ZLIB_LIBRARIES "${ZLIB_LIBRARIES}")
+      if(WIN32 AND CASS_USE_STATIC_LIBS)      
+        # string(REPLACE "zlib.lib" "zlibstatic.lib" ZLIB_LIBRARIES "${ZLIB_LIBRARIES}")        
       endif()
 
       # Assign zlib properties
