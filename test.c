@@ -4,6 +4,18 @@
 #include <stdio.h>
 #include "cassandra.h"
 
+
+CassError execute(CassSession* session, const char* query){
+   CassStatement* statement = cass_statement_new(query, 0);
+   CassFuture* result_future = cass_session_execute(session, statement);
+
+   cass_statement_free(statement);
+   CassError statementError = cass_future_error_code(result_future);
+   cass_future_free(result_future);
+
+   return statementError;
+}
+
 int runCassandra(){
 
     CassCluster* cluster = cass_cluster_new();
@@ -22,18 +34,39 @@ int runCassandra(){
         printf("Connection Failed \n");
     }else{        
 
-        for(int i = 0; i < 100; i++){
+      
+         time_t from;
+
+         time(&from);         
+
+         CassBatch* batch = cass_batch_new(CASS_BATCH_TYPE_LOGGED);
+
+         for(int i = 0; i < 1000; i++){
+
             CassStatement* statement = cass_statement_new("SELECT * FROM point_of_sale.transaction_log LIMIT 1", 0);
-            CassFuture* result_future = cass_session_execute(session, statement);
+            // CassFuture* result_future = cass_session_execute(session, statement);
+            cass_batch_add_statement(batch, statement);
 
-            CassError statementError = cass_future_error_code(result_future);
-
-            cass_future_free(result_future);
+            // CassError statementError = cass_future_error_code(result_future);
+            // cass_future_free(result_future);
             cass_statement_free(statement);
-        }
+         }
 
-        printf("Connection Success \n");       
+         CassFuture* batch_future = cass_session_execute_batch(session, batch);
 
+         /* Batch objects can be freed immediately after being executed */
+         cass_batch_free(batch);
+
+         CassError statementError = cass_future_error_code(batch_future);
+         cass_future_free(batch_future);
+
+         time_t to;
+         time(&to);
+         
+
+         printf("Took %ld(seconds)\n", to-from);
+
+        printf("Connection Success \n");
     }
 
 
@@ -44,9 +77,9 @@ int runCassandra(){
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
    int i;
    for(i = 0; i<argc; i++) {
-      printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+      // printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
    }
-   printf("\n");
+   // printf("\n");
    return 0;
 }
 
@@ -107,6 +140,7 @@ int runSqlite() {
 
     /* Execute SQL statement */
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+    rc = sqlite3_exec(db, "SELECT * FROM COMPANY WHERE ID = 2800007 LIMIT 1;", callback, 0, &zErrMsg);
    }
 
    rc = sqlite3_exec(db, "END TRANSACTION;", callback, 0, &zErrMsg);
@@ -127,4 +161,5 @@ int runSqlite() {
 
 int main(int argc, char* argv[]){
     runSqlite();
+   // runCassandra();
 }
