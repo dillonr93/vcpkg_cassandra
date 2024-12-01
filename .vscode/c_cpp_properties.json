@@ -12,6 +12,27 @@
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-clang-x64",
             "compileCommands": "${workspaceFolder}/.build/compile_commands.json"
+        },
+        {
+            "name": "Win",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${vcpkgRoot}/arm-neon-android24/include",
+                "${vcpkgRoot}/arm64-android24/include",
+                "${vcpkgRoot}/x64-android24/include",
+                "${vcpkgRoot}/x64-windows/include",
+                "${vcpkgRoot}/x64-windows-static/include",
+                "${vcpkgRoot}/x86-android24/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17"
         }
     ],
     "version": 4

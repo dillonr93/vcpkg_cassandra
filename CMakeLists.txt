@@ -38,11 +38,14 @@ find_package(OpenSSL REQUIRED)
 find_package(libuv CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 
+find_package(unofficial-sqlite3 CONFIG REQUIRED)
+
+
 add_subdirectory(cpp-driver)
 
 add_executable(test "test.c")
 target_include_directories(test PUBLIC cpp-driver/include)
-target_link_libraries(test PUBLIC cassandra)
+target_link_libraries(test PUBLIC cassandra PRIVATE unofficial::sqlite3::sqlite3)
 
 # Print variables
 # get_cmake_property(_variable_names VARIABLES)
