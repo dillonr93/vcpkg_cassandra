@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <sqlite3.h>
 #include <stdio.h>
+#include "time.h"
 #include "cassandra.h"
+
 
 
 CassError execute(CassSession* session, const char* query){
@@ -121,9 +123,12 @@ int runSqlite() {
       fprintf(stdout, "Table created successfully\n");
    }
 
-   time_t from;
+   clock_t from = clock();
+   
 
-   time(&from);
+   // time_t from;
+
+   // time(&from);
 
    rc = sqlite3_exec(db, "BEGIN TRANSACTION;", callback, 0, &zErrMsg);
 
@@ -145,10 +150,14 @@ int runSqlite() {
 
    rc = sqlite3_exec(db, "END TRANSACTION;", callback, 0, &zErrMsg);
 
-   time_t to;
-   time(&to);
+   // time_t to;
+   // time(&to);
 
-   printf("Took %ld(seconds)\n", to-from);
+   clock_t to = clock();
+
+   float total = (float)(to - from)/CLOCKS_PER_SEC;
+
+   printf("Took %f(ms)\n", total*1000);
 
 
    sqlite3_close(db);

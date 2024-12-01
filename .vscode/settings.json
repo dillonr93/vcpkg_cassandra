@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "cassandra.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "ctime": "c"
     }
 }
